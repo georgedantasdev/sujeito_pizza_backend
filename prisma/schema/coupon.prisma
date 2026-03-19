@@ -1,0 +1,17 @@
+model Coupon {
+  id         String    @id @default(uuid())
+  code       String
+  discount   Decimal   @db.Decimal(5, 2)
+  active     Boolean   @default(true)
+  pizzeriaId String
+  pizzeria   Pizzeria  @relation(fields: [pizzeriaId], references: [id])
+  orders     Order[]
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([pizzeriaId, code])
+  @@index([pizzeriaId])
+  @@index([active])
+  @@map("coupons")
+}

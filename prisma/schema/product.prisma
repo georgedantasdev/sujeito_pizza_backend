@@ -1,0 +1,46 @@
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String?
+  available   Boolean         @default(true)
+  pizzeriaId  String
+  pizzeria    Pizzeria        @relation(fields: [pizzeriaId], references: [id])
+  sizes       ProductSize[]
+  flavors     ProductFlavor[]
+  orderItems  OrderItem[]
+  deletedAt   DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([pizzeriaId])
+  @@index([available])
+  @@map("products")
+}
+
+model ProductSize {
+  id         String      @id @default(uuid())
+  name       String
+  price      Decimal     @db.Decimal(10, 2)
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([productId])
+  @@map("product_sizes")
+}
+
+model ProductFlavor {
+  id         String      @id @default(uuid())
+  name       String
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([productId])
+  @@map("product_flavors")
+}

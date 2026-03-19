@@ -1,0 +1,23 @@
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  password   String
+  role       Role      @default(EMPLOYEE)
+  pizzeriaId String?
+  pizzeria   Pizzeria? @relation(fields: [pizzeriaId], references: [id])
+  orders     Order[]
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([pizzeriaId])
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EMPLOYEE
+}

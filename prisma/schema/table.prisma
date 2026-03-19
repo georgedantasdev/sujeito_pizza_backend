@@ -1,0 +1,13 @@
+model Table {
+  id         String   @id @default(uuid())
+  number     Int
+  pizzeriaId String
+  pizzeria   Pizzeria @relation(fields: [pizzeriaId], references: [id])
+  orders     Order[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([pizzeriaId, number])
+  @@index([pizzeriaId])
+  @@map("tables")
+}

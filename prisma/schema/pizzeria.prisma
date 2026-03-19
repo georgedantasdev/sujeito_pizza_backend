@@ -1,0 +1,13 @@
+model Pizzeria {
+  id        String    @id @default(uuid())
+  name      String
+  document  String    @unique
+  users     User[]
+  products  Product[]
+  tables    Table[]
+  coupons   Coupon[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("pizzerias")
+}
