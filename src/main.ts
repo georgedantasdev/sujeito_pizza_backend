@@ -17,7 +17,7 @@ async function bootstrap() {
     .setTitle('Sujeito Pizza API')
     .setDescription('API do sistema de pizzaria')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'jwt')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
