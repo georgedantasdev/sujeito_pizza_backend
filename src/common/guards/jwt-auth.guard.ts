@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { UsersRepository } from '../../users/repository/users.repository';
+import { UsersRepository } from '../../modules/users/repository/users.repository';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()

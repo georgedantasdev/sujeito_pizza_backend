@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './repository/auth.repository';
 import { LoginDto } from './dto/login.dto';
@@ -30,6 +30,9 @@ export class AuthService {
       role: user.role,
     });
 
-    return { token };
+    return {
+      message: 'Login realizado com sucesso',
+      token,
+    };
   }
 }

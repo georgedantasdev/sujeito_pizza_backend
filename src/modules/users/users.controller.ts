@@ -12,8 +12,8 @@ import {
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import type { User } from '@prisma/client';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
