@@ -72,9 +72,9 @@ export class UsersRepository {
     return this.prisma.user.update({
       where: { id },
       data: {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.email !== undefined && { email: data.email }),
+        ...(hashedPassword !== undefined && { password: hashedPassword }),
       },
     });
   }

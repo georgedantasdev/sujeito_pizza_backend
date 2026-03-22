@@ -8,6 +8,7 @@ import envConfig from './config/env.config';
 import { PrismaModule } from './database/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { PizzeriasModule } from './modules/pizzerias/pizzerias.module';
+import { BootstrapModule } from './bootstrap/bootstrap.module';
 
 @Module({
   imports: [
@@ -15,10 +16,12 @@ import { PizzeriasModule } from './modules/pizzerias/pizzerias.module';
       isGlobal: true,
       load: [envConfig],
     }),
+
     PrismaModule,
     AuthModule,
     UsersModule,
     PizzeriasModule,
+    BootstrapModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

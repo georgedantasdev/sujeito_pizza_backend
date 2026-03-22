@@ -1,16 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  constructor() {
-    const connectionString = process.env.DATABASE_URL;
-
-    if (!connectionString) {
-      throw new Error('DATABASE_URL não definida no arquivo .env');
-    }
-
+  constructor(config: ConfigService) {
+    const connectionString = config.getOrThrow<string>('database.url');
     const adapter = new PrismaPg({ connectionString });
     super({ adapter });
   }

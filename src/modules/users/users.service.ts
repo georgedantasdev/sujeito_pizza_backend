@@ -29,10 +29,18 @@ export class UsersService {
       throw new ConflictException('Email já cadastrado');
     }
 
-    const pizzeriaId = currentUser.pizzeriaId;
+    let pizzeriaId: string;
 
-    if (!pizzeriaId) {
-      throw new ForbiddenException('Usuário não pertence a nenhuma pizzaria');
+    if (currentUser.role === Role.SUPER_ADMIN) {
+      if (!dto.pizzeriaId) {
+        throw new ForbiddenException('SUPER_ADMIN deve informar a pizzeriaId ao criar um ADMIN');
+      }
+      pizzeriaId = dto.pizzeriaId;
+    } else {
+      if (!currentUser.pizzeriaId) {
+        throw new ForbiddenException('Usuário não pertence a nenhuma pizzaria');
+      }
+      pizzeriaId = currentUser.pizzeriaId;
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);

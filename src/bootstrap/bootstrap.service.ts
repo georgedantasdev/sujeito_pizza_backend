@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from '../database/prisma.service';
 
 @Injectable()
 export class BootstrapService implements OnModuleInit {

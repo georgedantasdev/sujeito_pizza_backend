@@ -11,7 +11,7 @@ import { AuthRepository } from './repository/auth.repository';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
+        secret: config.get<string>('jwt.secret'),
         signOptions: { expiresIn: '7d' },
       }),
     }),

@@ -9,19 +9,20 @@ export class PizzeriasRepository {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: string): Promise<Pizzeria | null> {
-    return this.prisma.pizzeria.findUnique({
-      where: { id },
+    return this.prisma.pizzeria.findFirst({
+      where: { id, deletedAt: null },
     });
   }
 
   async findByDocument(document: string): Promise<Pizzeria | null> {
-    return this.prisma.pizzeria.findUnique({
-      where: { document },
+    return this.prisma.pizzeria.findFirst({
+      where: { document, deletedAt: null },
     });
   }
 
   async findAll(): Promise<Pizzeria[]> {
     return this.prisma.pizzeria.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -44,9 +45,10 @@ export class PizzeriasRepository {
     });
   }
 
-  async remove(id: string): Promise<Pizzeria> {
-    return this.prisma.pizzeria.delete({
+  async softDelete(id: string): Promise<Pizzeria> {
+    return this.prisma.pizzeria.update({
       where: { id },
+      data: { deletedAt: new Date() },
     });
   }
 }
