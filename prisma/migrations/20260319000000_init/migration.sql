@@ -11,20 +11,6 @@ CREATE TYPE "PaymentMethod" AS ENUM ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'PIX')
 CREATE TYPE "Role" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'EMPLOYEE');
 
 -- CreateTable
-CREATE TABLE "coupons" (
-    "id" TEXT NOT NULL,
-    "code" TEXT NOT NULL,
-    "discount" DECIMAL(5,2) NOT NULL,
-    "active" BOOLEAN NOT NULL DEFAULT true,
-    "pizzeriaId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "coupons_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'OPEN',
@@ -36,7 +22,6 @@ CREATE TABLE "orders" (
     "paymentMethod" "PaymentMethod",
     "tableId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "couponId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -136,15 +121,6 @@ CREATE TABLE "users" (
 );
 
 -- CreateIndex
-CREATE INDEX "coupons_pizzeriaId_idx" ON "coupons"("pizzeriaId");
-
--- CreateIndex
-CREATE INDEX "coupons_active_idx" ON "coupons"("active");
-
--- CreateIndex
-CREATE UNIQUE INDEX "coupons_pizzeriaId_code_key" ON "coupons"("pizzeriaId", "code");
-
--- CreateIndex
 CREATE INDEX "orders_tableId_idx" ON "orders"("tableId");
 
 -- CreateIndex
@@ -196,16 +172,10 @@ CREATE INDEX "users_pizzeriaId_idx" ON "users"("pizzeriaId");
 CREATE INDEX "users_email_idx" ON "users"("email");
 
 -- AddForeignKey
-ALTER TABLE "coupons" ADD CONSTRAINT "coupons_pizzeriaId_fkey" FOREIGN KEY ("pizzeriaId") REFERENCES "pizzerias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "tables"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_couponId_fkey" FOREIGN KEY ("couponId") REFERENCES "coupons"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "order_items" ADD CONSTRAINT "order_items_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -233,4 +203,3 @@ ALTER TABLE "tables" ADD CONSTRAINT "tables_pizzeriaId_fkey" FOREIGN KEY ("pizze
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_pizzeriaId_fkey" FOREIGN KEY ("pizzeriaId") REFERENCES "pizzerias"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-

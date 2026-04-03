@@ -4,7 +4,9 @@ export default () => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiresIn: '7d',
+    expiresIn: '15m',
+    refreshSecret: process.env.JWT_REFRESH_SECRET,
+    refreshExpiresInDays: 30,
   },
   superAdmin: {
     name: process.env.SUPER_ADMIN_NAME,

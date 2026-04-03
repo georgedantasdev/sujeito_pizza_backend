@@ -26,9 +26,7 @@ export class UsersRepository {
     });
   }
 
-  async findAllByPizzeria(
-    pizzeriaId: string,
-  ): Promise<Omit<User, 'password'>[]> {
+  async findAllByPizzeria(pizzeriaId: string) {
     return this.prisma.user.findMany({
       where: {
         pizzeriaId,
@@ -40,7 +38,6 @@ export class UsersRepository {
         email: true,
         role: true,
         createdAt: true,
-        password: false,
       },
     });
   }

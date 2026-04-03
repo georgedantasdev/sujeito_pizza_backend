@@ -9,6 +9,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PizzeriasModule } from './modules/pizzerias/pizzerias.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
+import { TablesModule } from './modules/tables/tables.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ProductsModule } from './modules/products/products.module';
     UsersModule,
     PizzeriasModule,
     ProductsModule,
+    TablesModule,
+    OrdersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

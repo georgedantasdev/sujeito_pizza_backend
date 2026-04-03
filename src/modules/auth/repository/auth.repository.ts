@@ -11,4 +11,10 @@ export class AuthRepository {
       where: { email },
     });
   }
+
+  async findById(id: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
+    });
+  }
 }
