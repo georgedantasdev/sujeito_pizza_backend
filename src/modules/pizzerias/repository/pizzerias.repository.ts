@@ -14,6 +14,10 @@ export class PizzeriasRepository {
     });
   }
 
+  async findByIdAny(id: string): Promise<Pizzeria | null> {
+    return this.prisma.pizzeria.findFirst({ where: { id } });
+  }
+
   async findByDocument(document: string): Promise<Pizzeria | null> {
     return this.prisma.pizzeria.findFirst({
       where: { document, deletedAt: null },
@@ -22,7 +26,6 @@ export class PizzeriasRepository {
 
   async findAll(): Promise<Pizzeria[]> {
     return this.prisma.pizzeria.findMany({
-      where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -49,6 +52,13 @@ export class PizzeriasRepository {
     return this.prisma.pizzeria.update({
       where: { id },
       data: { deletedAt: new Date() },
+    });
+  }
+
+  async activate(id: string): Promise<Pizzeria> {
+    return this.prisma.pizzeria.update({
+      where: { id },
+      data: { deletedAt: null },
     });
   }
 }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -46,8 +47,14 @@ export class PizzeriasController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Deletar pizzaria' })
+  @ApiOperation({ summary: 'Desativar pizzaria' })
   async remove(@Param('id') id: string) {
     return this.service.remove(id);
+  }
+
+  @Patch(':id/activate')
+  @ApiOperation({ summary: 'Ativar pizzaria' })
+  async activate(@Param('id') id: string) {
+    return this.service.activate(id);
   }
 }

@@ -116,6 +116,10 @@ export class UsersService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
+    if (currentUser.id === id) {
+      throw new ForbiddenException('Você não pode remover a si mesmo');
+    }
+
     if (
       currentUser.role === Role.ADMIN &&
       user.pizzeriaId !== currentUser.pizzeriaId

@@ -52,9 +52,10 @@ export class PizzeriasService {
 
     return {
       message: 'Pizzarias listadas com sucesso',
-      data: pizzerias.map(({ id, name, createdAt, updatedAt }) => ({
+      data: pizzerias.map(({ id, name, createdAt, updatedAt, deletedAt }) => ({
         id,
         name,
+        isActive: deletedAt === null,
         createdAt,
         updatedAt,
       })),
@@ -106,8 +107,38 @@ export class PizzeriasService {
       throw new NotFoundException('Pizzaria não encontrada');
     }
 
-    await this.repository.softDelete(id);
+    await this.prisma.$transaction([
+      this.prisma.pizzeria.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      }),
+      this.prisma.user.updateMany({
+        where: { pizzeriaId: id },
+        data: { deletedAt: new Date() },
+      }),
+    ]);
 
-    return { message: 'Pizzaria removida com sucesso' };
+    return { message: 'Pizzaria desativada com sucesso' };
+  }
+
+  async activate(id: string) {
+    const pizzeria = await this.repository.findByIdAny(id);
+
+    if (!pizzeria) {
+      throw new NotFoundException('Pizzaria não encontrada');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.pizzeria.update({
+        where: { id },
+        data: { deletedAt: null },
+      }),
+      this.prisma.user.updateMany({
+        where: { pizzeriaId: id },
+        data: { deletedAt: null },
+      }),
+    ]);
+
+    return { message: 'Pizzaria ativada com sucesso' };
   }
 }

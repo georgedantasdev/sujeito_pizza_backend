@@ -26,6 +26,10 @@ export class AuthService {
       throw new UnauthorizedException('Email ou senha inválidos');
     }
 
+    if (user.pizzeria?.deletedAt !== null && user.pizzeria?.deletedAt !== undefined) {
+      throw new UnauthorizedException('Esta pizzaria está desativada. Entre em contato com o suporte.');
+    }
+
     const payload = { sub: user.id, email: user.email, role: user.role };
 
     const accessToken = await this.jwt.signAsync(payload);

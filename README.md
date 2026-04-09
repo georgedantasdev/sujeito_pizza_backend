@@ -1,4 +1,4 @@
-# 🍕 Sujeito Pizza — Backend
+# 🍕 Pizzaria — Backend
 
 API REST desenvolvida com **NestJS** para um sistema de pizzaria, como projeto de estudo dos fundamentos do framework.
 
