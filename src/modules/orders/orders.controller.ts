@@ -15,7 +15,6 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { AddOrderItemDto } from './dto/add-order-item.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersService } from './orders.service';
 
@@ -94,14 +93,4 @@ export class OrdersController {
     return this.service.updateStatus(id, dto, user);
   }
 
-  @Patch(':id/payment')
-  @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Registrar pagamento do pedido' })
-  async processPayment(
-    @Param('id') id: string,
-    @Body() dto: ProcessPaymentDto,
-    @CurrentUser() user: User,
-  ) {
-    return this.service.processPayment(id, dto, user);
-  }
 }

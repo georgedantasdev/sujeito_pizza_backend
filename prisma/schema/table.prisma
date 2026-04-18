@@ -1,11 +1,22 @@
+enum TableStatus {
+  FREE
+  OCCUPIED
+}
+
 model Table {
-  id         String   @id @default(uuid())
-  number     Int
-  pizzeriaId String
-  pizzeria   Pizzeria @relation(fields: [pizzeriaId], references: [id])
-  orders     Order[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String         @id @default(uuid())
+  number        Int
+  pizzeriaId    String
+  status        TableStatus    @default(FREE)
+  openedAt      DateTime?
+  openedById    String?
+  paymentMethod PaymentMethod?
+  discount      Decimal        @default(0) @db.Decimal(10, 2)
+  paidAt        DateTime?
+  pizzeria      Pizzeria       @relation(fields: [pizzeriaId], references: [id])
+  orders        Order[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@unique([pizzeriaId, number])
   @@index([pizzeriaId])

@@ -6,9 +6,10 @@ model Product {
   available   Boolean         @default(true)
   pizzeriaId  String
   pizzeria    Pizzeria        @relation(fields: [pizzeriaId], references: [id])
-  sizes       ProductSize[]
-  flavors     ProductFlavor[]
-  orderItems  OrderItem[]
+  sizes         ProductSize[]
+  flavors       ProductFlavor[]
+  orderItems    OrderItem[]
+  deliveryItems DeliveryItem[]
   deletedAt   DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -24,9 +25,10 @@ model ProductSize {
   price      Decimal     @db.Decimal(10, 2)
   productId  String
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  orderItems    OrderItem[]
+  deliveryItems DeliveryItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([productId])
   @@map("product_sizes")
@@ -37,9 +39,10 @@ model ProductFlavor {
   name       String
   productId  String
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  orderItems    OrderItem[]
+  deliveryItems DeliveryItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([productId])
   @@map("product_flavors")

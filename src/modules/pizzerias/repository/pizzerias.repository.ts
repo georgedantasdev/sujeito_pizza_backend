@@ -26,6 +26,7 @@ export class PizzeriasRepository {
 
   async findAll(): Promise<Pizzeria[]> {
     return this.prisma.pizzeria.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
     });
   }

@@ -12,17 +12,14 @@ export class OrdersRepository {
     id: true,
     status: true,
     totalPrice: true,
-    discount: true,
     note: true,
-    paid: true,
-    paidAt: true,
-    paymentMethod: true,
     createdAt: true,
     updatedAt: true,
     table: {
       select: {
         id: true,
         number: true,
+        pizzeriaId: true,
       },
     },
     user: {
@@ -150,23 +147,6 @@ export class OrdersRepository {
     return this.prisma.order.update({
       where: { id },
       data: { status },
-      select: this.orderSelect,
-    });
-  }
-
-  async processPayment(
-    id: string,
-    paymentMethod: string,
-    discount: number,
-  ) {
-    return this.prisma.order.update({
-      where: { id },
-      data: {
-        paid: true,
-        paidAt: new Date(),
-        paymentMethod: paymentMethod as any,
-        discount,
-      },
       select: this.orderSelect,
     });
   }

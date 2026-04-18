@@ -2,9 +2,10 @@ model Pizzeria {
   id        String    @id @default(uuid())
   name      String
   document  String    @unique
-  users     User[]
-  products  Product[]
-  tables    Table[]
+  users      User[]
+  products   Product[]
+  tables     Table[]
+  deliveries Delivery[]
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
