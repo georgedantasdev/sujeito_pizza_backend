@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DeliveryStatus } from '@prisma/client';
+import { DeliveryStatus, PaymentMethod, Prisma } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { AddDeliveryItemDto } from '../dto/add-delivery-item.dto';
 import { CreateDeliveryDto } from '../dto/create-delivery.dto';
@@ -75,7 +75,7 @@ export class DeliveryRepository {
     });
   }
 
-  async addItem(deliveryId: string, dto: AddDeliveryItemDto, itemPrice: number) {
+  async addItem(deliveryId: string, dto: AddDeliveryItemDto, itemPrice: Prisma.Decimal) {
     const [item] = await this.prisma.$transaction([
       this.prisma.deliveryItem.create({
         data: {
@@ -99,13 +99,13 @@ export class DeliveryRepository {
       }),
       this.prisma.delivery.update({
         where: { id: deliveryId },
-        data: { totalPrice: { increment: itemPrice * dto.quantity } },
+        data: { totalPrice: { increment: itemPrice.mul(dto.quantity) } },
       }),
     ]);
     return item;
   }
 
-  async removeItem(itemId: string, deliveryId: string, itemTotal: number) {
+  async removeItem(itemId: string, deliveryId: string, itemTotal: Prisma.Decimal) {
     await this.prisma.$transaction([
       this.prisma.deliveryItem.delete({ where: { id: itemId } }),
       this.prisma.delivery.update({
@@ -122,6 +122,22 @@ export class DeliveryRepository {
     });
   }
 
+  async findProductForItem(productId: string, pizzeriaId: string, sizeId: string) {
+    return this.prisma.product.findFirst({
+      where: { id: productId, pizzeriaId },
+      select: {
+        available: true,
+        sizes: { where: { id: sizeId }, select: { id: true, price: true } },
+      },
+    });
+  }
+
+  async findFlavorForItem(flavorId: string, productId: string) {
+    return this.prisma.productFlavor.findFirst({
+      where: { id: flavorId, productId },
+    });
+  }
+
   async updateStatus(id: string, status: DeliveryStatus) {
     return this.prisma.delivery.update({
       where: { id },
@@ -130,11 +146,11 @@ export class DeliveryRepository {
     });
   }
 
-  async processPayment(id: string, paymentMethod: string, discount: number) {
+  async processPayment(id: string, paymentMethod: PaymentMethod, discount: number) {
     return this.prisma.delivery.update({
       where: { id },
       data: {
-        paymentMethod: paymentMethod as any,
+        paymentMethod,
         discount,
         paidAt: new Date(),
       },

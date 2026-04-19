@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { AddOrderItemDto } from '../dto/add-order-item.dto';
 import { CreateOrderDto } from '../dto/create-order.dto';
@@ -101,7 +101,7 @@ export class OrdersRepository {
   async addItem(
     orderId: string,
     dto: AddOrderItemDto,
-    itemPrice: number,
+    itemPrice: Prisma.Decimal,
   ) {
     const [item] = await this.prisma.$transaction([
       this.prisma.orderItem.create({
@@ -126,14 +126,14 @@ export class OrdersRepository {
       }),
       this.prisma.order.update({
         where: { id: orderId },
-        data: { totalPrice: { increment: itemPrice * dto.quantity } },
+        data: { totalPrice: { increment: itemPrice.mul(dto.quantity) } },
       }),
     ]);
 
     return item;
   }
 
-  async removeItem(itemId: string, orderId: string, itemTotal: number) {
+  async removeItem(itemId: string, orderId: string, itemTotal: Prisma.Decimal) {
     await this.prisma.$transaction([
       this.prisma.orderItem.delete({ where: { id: itemId } }),
       this.prisma.order.update({
@@ -160,6 +160,29 @@ export class OrdersRepository {
         quantity: true,
         price: true,
       },
+    });
+  }
+
+  async findTableById(tableId: string) {
+    return this.prisma.table.findUnique({
+      where: { id: tableId },
+      select: { id: true, pizzeriaId: true, status: true },
+    });
+  }
+
+  async findProductForItem(productId: string, pizzeriaId: string, sizeId: string) {
+    return this.prisma.product.findFirst({
+      where: { id: productId, pizzeriaId },
+      select: {
+        available: true,
+        sizes: { where: { id: sizeId }, select: { id: true, price: true } },
+      },
+    });
+  }
+
+  async findFlavorForItem(flavorId: string, productId: string) {
+    return this.prisma.productFlavor.findFirst({
+      where: { id: flavorId, productId },
     });
   }
 }

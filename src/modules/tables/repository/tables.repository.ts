@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PaymentMethod, TableStatus } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { CreateTableDto } from '../dto/create-table.dto';
 
@@ -78,7 +79,7 @@ export class TablesRepository {
     return this.prisma.table.update({
       where: { id },
       data: {
-        status: 'OCCUPIED',
+        status: TableStatus.OCCUPIED,
         openedAt: new Date(),
         openedById: userId,
         paymentMethod: null,
@@ -89,14 +90,14 @@ export class TablesRepository {
     });
   }
 
-  async closeTable(id: string, paymentMethod: string | null, discount: number) {
+  async closeTable(id: string, paymentMethod: PaymentMethod | null, discount: number) {
     return this.prisma.table.update({
       where: { id },
       data: {
-        status: 'FREE',
+        status: TableStatus.FREE,
         openedAt: null,
         openedById: null,
-        paymentMethod: paymentMethod as any,
+        paymentMethod,
         discount,
         paidAt: paymentMethod ? new Date() : null,
       },

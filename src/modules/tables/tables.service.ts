@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { TableStatus, User } from '@prisma/client';
 import { CloseTableDto } from './dto/close-table.dto';
 import { CreateTableDto } from './dto/create-table.dto';
 import { TablesRepository } from './repository/tables.repository';
@@ -62,7 +62,7 @@ export class TablesService {
     if (table.pizzeriaId !== currentUser.pizzeriaId) {
       throw new ForbiddenException('Mesa não pertence à sua pizzaria');
     }
-    if (table.status === 'OCCUPIED') {
+    if (table.status === TableStatus.OCCUPIED) {
       throw new BadRequestException('Não é possível remover uma mesa ocupada');
     }
 
@@ -80,7 +80,7 @@ export class TablesService {
     if (table.pizzeriaId !== currentUser.pizzeriaId) {
       throw new ForbiddenException('Mesa não pertence à sua pizzaria');
     }
-    if (table.status === 'OCCUPIED') {
+    if (table.status === TableStatus.OCCUPIED) {
       throw new ConflictException('Mesa já está ocupada');
     }
 
@@ -98,7 +98,7 @@ export class TablesService {
     if (table.pizzeriaId !== currentUser.pizzeriaId) {
       throw new ForbiddenException('Mesa não pertence à sua pizzaria');
     }
-    if (table.status === 'FREE') {
+    if (table.status === TableStatus.FREE) {
       throw new BadRequestException('Mesa já está livre');
     }
 

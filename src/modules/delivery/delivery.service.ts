@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DeliveryStatus, Role, User } from '@prisma/client';
-import { PrismaService } from '../../database/prisma.service';
 import { AddDeliveryItemDto } from './dto/add-delivery-item.dto';
 import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { ProcessDeliveryPaymentDto } from './dto/process-delivery-payment.dto';
@@ -14,10 +13,7 @@ import { DeliveryRepository } from './repository/delivery.repository';
 
 @Injectable()
 export class DeliveryService {
-  constructor(
-    private repository: DeliveryRepository,
-    private prisma: PrismaService,
-  ) {}
+  constructor(private repository: DeliveryRepository) {}
 
   async create(dto: CreateDeliveryDto, currentUser: User) {
     if (!currentUser.pizzeriaId) {
@@ -56,15 +52,11 @@ export class DeliveryService {
     if (!delivery) throw new NotFoundException('Entrega não encontrada');
     this.assertBelongsToPizzeria(delivery, currentUser);
 
-    if (delivery.status === 'DELIVERED' || delivery.status === 'CANCELLED') {
+    if (delivery.status === DeliveryStatus.DELIVERED || delivery.status === DeliveryStatus.CANCELLED) {
       throw new BadRequestException('Não é possível adicionar itens a uma entrega finalizada');
     }
 
-    // B8: valida disponibilidade do produto antes de adicionar
-    const product = await this.prisma.product.findFirst({
-      where: { id: dto.productId, pizzeriaId: currentUser.pizzeriaId },
-      select: { available: true, sizes: { where: { id: dto.sizeId }, select: { id: true, price: true } } },
-    });
+    const product = await this.repository.findProductForItem(dto.productId, currentUser.pizzeriaId, dto.sizeId);
 
     if (!product) throw new NotFoundException('Produto não encontrado');
     if (!product.available) throw new BadRequestException('Produto não está disponível no momento');
@@ -73,13 +65,11 @@ export class DeliveryService {
     if (!size) throw new NotFoundException('Tamanho não encontrado para este produto');
 
     if (dto.flavorId) {
-      const flavor = await this.prisma.productFlavor.findFirst({
-        where: { id: dto.flavorId, productId: dto.productId },
-      });
+      const flavor = await this.repository.findFlavorForItem(dto.flavorId, dto.productId);
       if (!flavor) throw new NotFoundException('Sabor não encontrado para este produto');
     }
 
-    const item = await this.repository.addItem(deliveryId, dto, Number(size.price));
+    const item = await this.repository.addItem(deliveryId, dto, size.price);
     return { message: 'Item adicionado', data: item };
   }
 
@@ -91,7 +81,7 @@ export class DeliveryService {
     if (!delivery) throw new NotFoundException('Entrega não encontrada');
     this.assertBelongsToPizzeria(delivery, currentUser);
 
-    if (delivery.status === 'DELIVERED' || delivery.status === 'CANCELLED') {
+    if (delivery.status === DeliveryStatus.DELIVERED || delivery.status === DeliveryStatus.CANCELLED) {
       throw new BadRequestException('Não é possível remover itens de uma entrega finalizada');
     }
 
@@ -100,7 +90,7 @@ export class DeliveryService {
       throw new NotFoundException('Item não encontrado nesta entrega');
     }
 
-    const itemTotal = Math.round(Number(item.price) * item.quantity * 100) / 100;
+    const itemTotal = item.price.mul(item.quantity);
     await this.repository.removeItem(itemId, deliveryId, itemTotal);
     return { message: 'Item removido' };
   }
@@ -112,6 +102,19 @@ export class DeliveryService {
     const delivery = await this.repository.findById(id);
     if (!delivery) throw new NotFoundException('Entrega não encontrada');
     this.assertBelongsToPizzeria(delivery, currentUser);
+
+    const validTransitions: Record<DeliveryStatus, DeliveryStatus[]> = {
+      [DeliveryStatus.PREPARING]: [DeliveryStatus.READY, DeliveryStatus.CANCELLED],
+      [DeliveryStatus.READY]: [DeliveryStatus.DELIVERED, DeliveryStatus.CANCELLED],
+      [DeliveryStatus.DELIVERED]: [],
+      [DeliveryStatus.CANCELLED]: [],
+    };
+
+    if (!validTransitions[delivery.status].includes(dto.status)) {
+      throw new BadRequestException(
+        `Transição de status inválida: ${delivery.status} → ${dto.status}`,
+      );
+    }
 
     const updated = await this.repository.updateStatus(id, dto.status);
     return { message: 'Status atualizado', data: updated };

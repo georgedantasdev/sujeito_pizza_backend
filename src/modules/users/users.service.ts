@@ -83,6 +83,10 @@ export class UsersService {
       throw new ForbiddenException('Você só pode atualizar o próprio perfil');
     }
 
+    if (currentUser.role === Role.ADMIN && user.pizzeriaId !== currentUser.pizzeriaId) {
+      throw new ForbiddenException('Você só pode atualizar usuários da sua pizzaria');
+    }
+
     if (dto.email && dto.email !== user.email) {
       const emailExists = await this.repository.findByEmail(dto.email);
       if (emailExists) {
